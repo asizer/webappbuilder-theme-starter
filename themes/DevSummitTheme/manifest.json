@@ -7,6 +7,11 @@
       "name": "default",
       "description": "Aqua blues",
       "styleColor": "#8FC3D2"
+    },
+    {
+      "name": "green",
+      "description": "TODO: Change this description and styleColor for green",
+      "styleColor": "#00ff00"
     }
   ],
   "layouts": [

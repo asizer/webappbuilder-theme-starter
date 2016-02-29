@@ -11,7 +11,7 @@ module.exports = function(grunt) {
     // these are the properties transferred from the original theme config.json to
     // the generated test config. Supports chained properties with dots up to four deep.
     var overwriteProperties = ['widgetOnScreen', 'map.2D', 'map.3D', 'map.position', 'widgetPool'];
-    var processedConfigs = {};
+    var processedConfigs = [];
     var processedThemes = {};
 
     /* ---------- function definitions ---------- */
@@ -33,7 +33,7 @@ module.exports = function(grunt) {
         existingConfig.logo = 'themes/' + options.theme + '/images/icon.png';
         grunt.log.writeln('Generating config file ' + options.dest['green']);
       }
-      processedThemes[options.name].layouts.push(options.layout);
+      processedThemes[options.theme].layouts.push(options.layout);
       processedConfigs.push(options.dest);
       return existingConfig;
     }
@@ -73,19 +73,22 @@ module.exports = function(grunt) {
 
       // list available styles in config
       var themeColorFiles = grunt.file.expand('themes/' + themeName + '/styles/*/style.css');
-      outputConfig.styles = outputConfig.styles || [];
+      outputConfig.theme.styles = outputConfig.theme.styles || [];
       // copy existing styles to compare later
       var processedStyles = [];
       themeColorFiles.forEach(function(colorFile) {
         var colorSplit = colorFile.split('/');
         var colorName = getAdjacent(colorSplit, 'styles');
-        if (outputConfig.styles.indexOf(colorName) < 0) {
-          outputConfig.styles.push(colorName);
+        if (outputConfig.theme.styles.indexOf(colorName) < 0) {
+          outputConfig.theme.styles.push(colorName);
         }
         processedStyles.push(colorName);
+        if (processedThemes[themeName].colors.indexOf(colorName) < 0) {
+          processedThemes[themeName].colors.push(colorName);
+        }
       });
       // get rid of output styles that don't exist anymore
-      outputConfig.styles = outputConfig.styles.filter(function(style) {
+      outputConfig.theme.styles = outputConfig.theme.styles.filter(function(style) {
         return processedStyles.indexOf(style) >= 0;
       });
     }
@@ -107,6 +110,7 @@ module.exports = function(grunt) {
           });
         }
       });
+      console.log('manifest.styles', JSON.stringify(manifest.styles));
       manifest.styles = manifest.styles.filter(function(colorObj) {
         return processedThemes[theme].colors.indexOf(colorObj.name) >= 0;
       });
@@ -130,19 +134,18 @@ module.exports = function(grunt) {
     }
 
     function updateManifests() {
-      for (var theme in processedThemes) {
-        if (processedThemes.hasOwnProperty(theme)) {
-          var manifest = grunt.file.readJSON('themes/' + theme + '/manifest.json');
-          processManifestColors(theme, manifest);
-          processManifestLayouts(theme, manifest);
-        }
-      }
+      console.log('processedThemes keys', Object.keys(processedThemes));
+      Object.keys(processedThemes).forEach(function(theme) {
+        var fileName = 'themes/' + theme + '/manifest.json';
+        var manifest = grunt.file.readJSON(fileName);
+        processManifestColors(theme, manifest);
+        processManifestLayouts(theme, manifest);
+        grunt.file.write(fileName, JSON.stringify(manifest, null, '  '));
+      });
     }
 
     function cleanupThemeConfigs() {
       var generatedConfigs = grunt.file.expand(themeconfigsDir +  '/config-*.json');
-      console.log('generatedConfigs', generatedConfigs);
-      console.log('processedThemes', JSON.stringify(processedThemes));
       generatedConfigs.forEach(function(genConfig) {
         if (processedConfigs.indexOf(genConfig) < 0) {
           grunt.log.writeln('Should delete old generated config here'['red']);
@@ -172,6 +175,7 @@ module.exports = function(grunt) {
         layouts: [],
         colors: []
       };
+      grunt.log.writeln('processedThemes', JSON.stringify(processedThemes));
 
       var outputConfig = processThemeConfig({
         file: fileName,
