@@ -1,0 +1,25 @@
+{
+  "name": "DevSummitTheme",
+  "platform": "HTML",
+  "panels": [],
+  "styles": [
+    {
+      "name": "default",
+      "description": "Aqua blues",
+      "styleColor": "#8FC3D2"
+    }
+  ],
+  "layouts": [
+    {
+      "name": "default",
+      "description": "this is the default layout"
+    }
+  ],
+  "widgets": [],
+  "version": "1.3",
+  "wabVersion": "1.3",
+  "author": "Esri R&D Center Beijing",
+  "description": "",
+  "copyright": "",
+  "license": "http://www.apache.org/licenses/LICENSE-2.0"
+}

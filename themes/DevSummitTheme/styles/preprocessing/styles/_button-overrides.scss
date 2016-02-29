@@ -1,0 +1,64 @@
+
+/* ---------- ALL BUTTONS ---------- */
+.dijitButtonHover .dijitButtonNode,
+.dijitDropDownButtonHover .dijitButtonNode,
+.dijitComboButtonHover .dijitButtonNode,
+.dijitToggleButtonHover .dijitButtonNode,
+.dijitToolbar .dijitButtonHover .dijitButtonNode,
+.dijitToolbar .dijitDropDownButtonHover .dijitButtonNode,
+.dijitToolbar .dijitToggleButtonHover .dijitButtonNode,
+.dijitToolbar .dijitComboButtonHover .dijitButtonNode,
+.btn-transparent:hover {
+  border: 1px solid $bright;
+}
+
+.dijitToolbar .dijitButtonActive .dijitButtonNode,
+.dijitToolbar .dijitDropDownButtonActive .dijitButtonNode,
+.dijitToolbar .dijitToggleButtonActive .dijitButtonNode,
+.dijitButtonActive .dijitButtonNode,
+.dijitDropDownButtonActive .dijitButtonNode,
+.dijitComboButtonActive .dijitButtonNode,
+.dijitToggleButtonActive .dijitButtonNode {
+  background: $slightly-less-pale;
+  border: 1px solid $bright-darker1;
+}
+
+.dijitToolbar .dijitToggleButtonChecked .dijitButtonNode {
+  background: $slightly-less-pale;
+  border-color: $bright;
+}
+
+.dijitToolbar .dijitToggleButtonChecked .dijitButtonNode .dijitButtonText {
+  color: $darker;
+}
+
+/* ---------- CHECKBOXES ---------- */
+/* regular checked */
+.dijitCheckBoxChecked {
+  background-color: $bright;
+  border: 1px solid $bright-darker2;
+}
+
+/* hover */
+/* over unchecked */
+.dijitCheckBoxHover {
+  background-color: $palest;
+  border: 1px solid $bright-darker1;
+}
+
+/* over checked */
+.dijitCheckBoxCheckedHover {
+  background-color: $bright-darker1;
+  border: 1px solid $bright-darker2;
+}
+
+/* ---------- RADIO BUTTONS ---------- */
+.dijitRadio,
+.dijitRadioIcon {
+  border-color: $bright-darker1;
+}
+
+.dijitRadio:after,
+.dijitRadioIcon:after {
+  background: $bright-darker1;
+}

@@ -1,0 +1,104 @@
+{
+  "widgetOnScreen": {
+    "widgets": [{
+      "uri": "widgets/Scalebar/Widget",
+      "position": {
+        "left": 10,
+        "bottom": 5
+      }
+    }, {
+      "uri": "widgets/Search/Widget",
+      "position": {
+        "left": 50,
+        "top": 10
+      }
+    }, {
+      "label": "Coordinate",
+      "uri": "widgets/Coordinate/Widget",
+      "position": {
+        "left": 185,
+        "bottom": 5
+      }
+    }, {
+      "uri": "widgets/LayerList/Widget",
+      "position": {
+        "left": 50,
+        "top": 55
+      }
+    }, {
+      "uri": "widgets/BasemapGallery/Widget",
+      "position": {
+        "left": 100,
+        "top": 55
+      }
+    }, {
+      "position": {
+        "left": 150,
+        "top": 55
+      }
+    }, {
+      "label": "Overview",
+      "uri": "widgets/OverviewMap/Widget",
+      "position": {
+        "bottom": 0,
+        "right": 0
+      }
+    }, {
+      "uri": "widgets/ZoomSlider/Widget",
+      "position": {
+        "top": 10,
+        "left": 7
+      }
+    }, {
+      "uri": "widgets/HomeButton/Widget",
+      "position": {
+        "left": 7,
+        "top": 75
+      }
+    }, {
+      "uri": "widgets/MyLocation/Widget",
+      "position": {
+        "left": 7,
+        "top": 110
+      }
+    }, {
+      "uri": "widgets/AttributeTable/Widget",
+      "position": {
+        "relativeTo": "browser"
+      }
+    }],
+    "groups": [{
+      "visible": false,
+      "panel": {
+        "uri": "themes/DevSummitTheme/panels/RDockablePanel/Panel",
+        "position": {
+          "right": 0,
+          "top": 110,
+          "bottom": 0,
+          "width": 360,
+          "relativeTo": "browser"
+        }
+      },
+      "maxWidgets": 1,
+      "widgets": []
+    }]
+  },
+
+  "map": {
+    "3D": false,
+    "2D": true,
+
+    "position": {
+      "left": 0,
+      "top": 120,
+      "right": 0,
+      "bottom": 0
+    }
+  },
+
+  "widgetPool": {
+    "panel": {},
+    "groups": [],
+    "widgets": []
+  }
+}

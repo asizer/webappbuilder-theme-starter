@@ -1,0 +1,54 @@
+/* make text in all widgets match theme's dark color */
+.jimu-widget {
+  color: $darker;
+}
+
+.jimu-widget-zoomslider {
+  color: $palest;
+}
+
+.jimu-title,
+.jimu-subtitle {
+  color: $slightly-less-pale;
+}
+
+.jimu-dropmenu .menu-item:hover {
+  color: $bright-darker1;
+}
+
+.jimu-dropmenu .menu-item-dissable:hover {
+  color: #c1c1c1;
+}
+
+/* ---------- on-screen icons and search ---------- */
+.jimu-widget-search .arcgisSearch .searchBtn:hover,
+.jimu-widget-search .arcgisSearch .searchBtn:focus {
+  background-color: $darker;
+}
+
+.arcgisSearch .searchGroup .searchInput,
+.arcgisSearch .searchBtn {
+  border-color: $darker;
+  color: $darker;
+}
+
+.jimu-widget-onscreen-icon,
+.jimu-widget-homebutton,
+.jimu-widget-mylocation,
+.jimu-widget-zoomslider,
+.jimu-widget-coordinate .coordinate-background {
+  background-color: $darker;
+  background-color: rgba($darker, 0.5);
+}
+
+.jimu-widget-onscreen-icon {
+  border: 1px solid $darker;
+}
+
+.jimu-widget-onscreen-icon:hover,
+.jimu-widget-homebutton:hover,
+.jimu-widget-mylocation:hover,
+.jimu-widget-zoomslider .zoom:hover {
+  background-color: $darker;
+  background-color: rgba($darker, 0.8);
+}

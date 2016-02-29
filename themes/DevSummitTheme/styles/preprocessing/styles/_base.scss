@@ -1,0 +1,57 @@
+body {
+  color: $darker;
+  background: $palest;
+}
+
+a {
+  color: $bright-darker1;
+}
+
+.jimu-main-background {
+  background-color: $darker;
+}
+
+.dijitTooltipDialog .dijitTooltipContainer {
+  color: $darker;
+  background: $palest;
+}
+
+#map {
+  /* wab gives the map div an #eee background inline :( */
+  background: $palest !important;
+}
+
+.accent-bg {
+  background-color: $accent;
+  color: $palest;
+}
+
+.accent-bg-trans {
+  background-color: $accent;
+  background-color: rgba($accent, 0.9);
+  color: $palest;
+}
+
+.dark-text {
+  color: $darker;
+}
+
+.medium-text {
+  color: $bright;
+}
+
+.light-text {
+  color: $palest;
+}
+
+.warning-text {
+  color: $accent;
+}
+
+.light-bg {
+  background: $palest;
+}
+
+.esriViewPopup .hzLine {
+  border-color: $darker;
+}

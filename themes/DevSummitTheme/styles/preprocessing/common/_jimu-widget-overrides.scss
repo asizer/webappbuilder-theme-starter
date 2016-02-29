@@ -1,0 +1,29 @@
+
+/* get rid of background colors so the styles can add them back in */
+.jimu-widget-homebutton .HomeButton .home,
+.jimu-widget-homebutton .HomeButton,
+.jimu-widget-mylocation .place-holder,
+.jimu-widget-homebutton .HomeButton .home:hover,
+.jimu-widget-homebutton .HomeButton:hover,
+.jimu-widget-mylocation .place-holder:hover {
+  background-color: transparent;
+}
+
+/* get rid of border radius */ 
+.jimu-widget-onscreen-icon,
+.jimu-widget-homebutton,
+.jimu-widget-mylocation,
+.jimu-widget-zoomslider,
+.jimu-widget-coordinate .coordinate-background,
+.arcgisSearch .searchGroup .searchInput,
+.arcgisSearch .searchBtn {
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+
+/* override hardcodes */
+.jimu-widget-layerList .layer-row,
+.dijitContentPane {
+  background-color: transparent;
+}

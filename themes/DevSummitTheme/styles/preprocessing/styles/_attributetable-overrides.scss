@@ -1,0 +1,55 @@
+/* sometimes need to add 'body' selector to get these rules
+to take precedence, since the theme stylesheets get loaded
+before the widget stylesheets */
+
+/* attribute table hover row */
+body .jimu-widget-attributetable .dgrid-row:hover {
+  background-color: $slightly-less-pale;
+}
+
+/* attribute table selected row */
+body .jimu-widget-attributetable .ui-state-active {
+  background-color: $bright;
+}
+
+/* attribute table hover over selected row */
+body .jimu-widget-attributetable .ui-state-active:hover {
+  background-color: $bright-darker1;
+}
+
+/* attribute table selected tab */
+.jimu-widget-attributetable .dijitTabContainerTop-tabs .dijitTabChecked:before {
+  background: $bright;
+}
+
+/* background colors */
+.jimu-widget-attributetable,
+.jimu-widget-attributetable-main,
+.jimu-widget-attributetable .dgrid-row-odd {
+  background-color: $palest;
+}
+
+.jimu-widget-attributetable .dijitToolbar,
+.jimu-widget-attributetable .dgrid-header {
+  background-color: $less-pale;
+}
+
+/* attribute table dropup menu */
+.dijitMenuPopup .dijitMenuItem,
+.dijitMenuPopup .dijitMenuItem td {
+  color: $darker;
+}
+
+/* color menu items */
+.dijitMenuPopup .dijitMenuItemSelected td,
+.dijitMenuPopup .dijitMenuItemSelected {
+  background: $bright;
+  color: $palest;
+}
+
+/* make disabled menu items grayer */
+.dijitDisabled.dijitMenuItemSelected td,
+.dijitDisabled.dijitMenuItemSelected {
+  background: $slightly-less-pale;
+  color: $darker;
+}
