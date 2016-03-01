@@ -4,6 +4,101 @@ module.exports = function(grunt) {
   var stemappDir = '../../custombuilders/devsummitbuilder13/client/stemapp';
   var themeconfigsDir = 'themeconfigs';
 
+
+
+  // Load grunt tasks automatically
+  require('load-grunt-tasks')(grunt);
+
+  grunt.initConfig({
+    watch: {
+      main: {
+        files: [
+          'themes/**',
+          '!themes/*/styles/preprocessing/**',
+          '!themes/*/layouts/*/config.json',
+          themeconfigsDir + '/**'],
+        tasks: ['sync'],
+        options: {
+        }
+      },
+      layoutsAndColors: {
+        files: ['themes/*/layouts/*/config.json', 'themes/*/styles/*/style.css'],
+        tasks: ['generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync'],
+        options: {
+          event: ['added', 'deleted']
+        }
+      },
+      themeConfigs: {
+        // need to include styles here in case the style config isn't already written
+        files: ['themes/*/layouts/*/config.json'],
+        tasks: ['generateThemeConfig', 'sync'],
+        options: {
+        }
+      },
+      css: {
+        files: ['themes/*/styles/preprocessing/**'],
+        tasks: ['sass:dev', 'sync'],
+        options: {
+        }
+      }
+
+    },
+
+    sass: {
+      dev: {
+        options: {
+          lineNumbers: true,
+          outputStyle: 'expanded'
+        },
+        files: [{
+          cwd: 'themes/',
+          src: ['*/styles/preprocessing/*.scss', '!*/styles/preprocessing/_*.scss'],
+          dest: 'themes/',
+          rename: function(dest, src) {
+            var srcSplit = src.split('/');
+            var themeName = srcSplit[0];
+            var styleName = srcSplit[3].slice(0, srcSplit[3].lastIndexOf('.'));
+            var actualDest;
+            if (styleName === 'common') {
+              // common.css lives in the theme's root
+              actualDest = dest + themeName + '/common.css';
+            } else {
+              // style-specific css lives in the theme's styles/styleName folder as style.css
+              actualDest = dest + themeName + '/styles/' + styleName + '/style.css';
+            }
+            grunt.log.writeln('writing css file ' + actualDest['cyan']);
+            return actualDest;
+          },
+          expand: true
+        }]
+      }
+    },
+
+    sync: {
+      main: {
+        files: [{
+          src: ['themes/**', themeconfigsDir + '/**', '!themes/*/styles/preprocessing/**'],
+          dest: stemappDir
+        }],
+        verbose: true // Display log messages when syncing files
+      }
+    }
+
+  });
+
+  grunt.registerTask('default', ['sass', 'generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync', 'watch']);
+
+
+
+
+
+
+
+
+  /* ---------- CODE THAT MIGHT EVENTUALLY END UP AS ITS OWN PLUGIN(S) SOMEDAY ---------- */
+  /* -------- but fow now will just live here as registeredTasks in this project -------- */
+
+
   /* ---------- some utility functions used by multiple custom tasks below ---------- */
   function getAdjacent(split, term) {
     return split[split.indexOf(term) + 1];
@@ -58,9 +153,9 @@ module.exports = function(grunt) {
   grunt.registerTask('updateThemeManifests', 'update manifest.json files to reflect current state of theme layouts and colors', function() {
 
     function processManifestColors(theme, manifest) {
-      var colorLayoutDirs = grunt.file.expand('themes/' + theme + '/styles/*')
+      var colorLayoutDirs = grunt.file.expand('themes/' + theme + '/styles/*/style.css')
         .filter(function(fileName) {
-          return grunt.file.isDir(fileName) && fileName.indexOf('preprocessing') < 0;
+          return fileName.indexOf('preprocessing') < 0;
         }).map(function(fileName) {
           return getAdjacent(fileName.split('/'), 'styles');
         });
@@ -83,10 +178,8 @@ module.exports = function(grunt) {
     }
 
     function processManifestLayouts(theme, manifest) {
-      var themeLayoutDirs = grunt.file.expand('themes/' + theme + '/layouts/*')
-        .filter(function(fileName) {
-          return grunt.file.isDir(fileName);
-        }).map(function(fileName) {
+      var themeLayoutDirs = grunt.file.expand('themes/' + theme + '/layouts/*/config.json')
+        .map(function(fileName) {
           return getAdjacent(fileName.split('/'), 'layouts');
         });
 
@@ -117,11 +210,10 @@ module.exports = function(grunt) {
 
     /* ---------- code --------- */
 
-    var themeConfigDirs = grunt.file.expand('themes/*').filter(function(fileName) {
-      return grunt.file.isDir(fileName);
-    }).map(function(fileName) {
-      return getAdjacent(fileName.split('/'), 'themes');
-    });
+    var themeConfigDirs = grunt.file.expand('themes/*/manifest.json')
+      .map(function(fileName) {
+        return getAdjacent(fileName.split('/'), 'themes');
+      });
 
     themeConfigDirs.forEach(function(themeName) {
       updateManifest(themeName);
@@ -230,92 +322,4 @@ module.exports = function(grunt) {
 
   });
 
-  // Load grunt tasks automatically
-  require('load-grunt-tasks')(grunt);
-
-  grunt.initConfig({
-    watch: {
-      main: {
-        files: [
-          'themes/**',
-          '!themes/*/styles/preprocessing/**',
-          '!themes/*/layouts/*/config.json',
-          themeconfigsDir + '/**'],
-        tasks: ['sync'],
-        options: {
-          spawn: false
-        }
-      },
-      layoutsAndColors: {
-        files: ['themes/*/layouts/*/config.json', 'themes/*/styles/*/style.css'],
-        tasks: ['generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync'],
-        options: {
-          event: ['added', 'deleted'],
-          spawn: false
-        }
-      },
-      themeConfigs: {
-        // need to include styles here in case the style config isn't already written
-        files: ['themes/*/layouts/*/config.json'],
-        tasks: ['generateThemeConfig', 'sync'],
-        options: {
-          spawn: false
-        }
-      },
-      css: {
-        files: ['themes/*/styles/preprocessing/**'],
-        tasks: ['sass:dev', 'sync'],
-        options: {
-          spawn: false
-        }
-      }
-
-    },
-
-    sass: {
-      dev: {
-        options: {
-          lineNumbers: true,
-          outputStyle: 'expanded'
-        },
-        files: [{
-          cwd: 'themes/',
-          src: ['*/styles/preprocessing/*.scss', '!*/styles/preprocessing/_*.scss'],
-          dest: 'themes/',
-          rename: function(dest, src) {
-            var srcSplit = src.split('/');
-            var themeName = srcSplit[0];
-            var styleName = srcSplit[3].slice(0, srcSplit[3].lastIndexOf('.'));
-            var actualDest;
-            if (styleName === 'common') {
-              // common.css lives in the theme's root
-              actualDest = dest + themeName + '/common.css';
-            } else {
-              // style-specific css lives in the theme's styles/styleName folder as style.css
-              actualDest = dest + themeName + '/styles/' + styleName + '/style.css';
-            }
-            grunt.log.writeln('writing css file ' + actualDest['cyan']);
-            return actualDest;
-          },
-          expand: true
-        }]
-      }
-    },
-
-    sync: {
-      main: {
-        files: [{
-          src: ['themes/**', themeconfigsDir + '/**', '!themes/*/styles/preprocessing/**'],
-          dest: stemappDir
-        }],
-        verbose: true // Display log messages when syncing files
-      }
-    }
-
-  });
-
-  grunt.registerTask('default', ['sass', 'generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync', 'watch']);
-  grunt.event.on('watch', function(action, filepath, target) {
-    grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
-  });
 };
