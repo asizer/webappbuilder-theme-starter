@@ -4,15 +4,135 @@ module.exports = function(grunt) {
   var stemappDir = '../../custombuilders/devsummitbuilder13/client/stemapp';
   var themeconfigsDir = 'themeconfigs';
 
-  // Load grunt tasks automatically
-  require('load-grunt-tasks')(grunt);
+  /* ---------- some utility functions used by multiple custom tasks below ---------- */
+  function getAdjacent(split, term) {
+    return split[split.indexOf(term) + 1];
+  }
+
+  function getLayoutDest(themeName, layoutName) {
+    return themeconfigsDir +  '/config-' + themeName + '-' + layoutName + '.json';
+  }
+
+  /* ---------- tasks to process and copy theme configs and manifests ---------- */
+
+  grunt.registerTask('suggestConfigCleanups', 'report unused theme configs', function() {
+
+    /* ---------- functions ---------- */
+
+    function findThemeLayouts(theme) {
+      var themeLayoutNames = grunt.file.expand('themes/' + theme + '/layouts/*')
+        .filter(function(fileName) {
+          return grunt.file.isDir(fileName);
+        }).map(function(fileName) {
+          return getAdjacent(fileName.split('/'), 'layouts');
+        });
+      return themeLayoutNames;
+    }
+
+    /* ---------- code ---------- */
+
+    var themeNames = grunt.file.expand('themes/*').filter(function(fileName) {
+      return grunt.file.isDir(fileName);
+    }).map(function(fileName) {
+      return getAdjacent(fileName.split('/'), 'themes');
+    });
+
+    var processedConfigs = [];
+
+    themeNames.forEach(function(themeName) {
+      var layouts = findThemeLayouts(themeName);
+      layouts.forEach(function(layoutName) {
+        processedConfigs.push(getLayoutDest(themeName, layoutName));
+      });
+    });
+
+    var generatedConfigs = grunt.file.expand(themeconfigsDir +  '/config-*.json');
+    generatedConfigs.forEach(function(genConfig) {
+      if (processedConfigs.indexOf(genConfig) < 0) {
+        grunt.log.writeln('Outdated config should be removed, here and in stemapp: ' + genConfig['red']);
+      }
+    });
+
+  });
+
+  grunt.registerTask('updateThemeManifests', 'update manifest.json files to reflect current state of theme layouts and colors', function() {
+
+    function processManifestColors(theme, manifest) {
+      var colorLayoutDirs = grunt.file.expand('themes/' + theme + '/styles/*')
+        .filter(function(fileName) {
+          return grunt.file.isDir(fileName) && fileName.indexOf('preprocessing') < 0;
+        }).map(function(fileName) {
+          return getAdjacent(fileName.split('/'), 'styles');
+        });
+
+      colorLayoutDirs.forEach(function(colorName) {
+        var exists = manifest.styles.some(function(colorObj) {
+          return colorObj.name === colorName;
+        });
+        if (!exists) {
+          manifest.styles.push({
+            name: colorName,
+            description: 'TODO: Change this description and styleColor for ' + colorName,
+            styleColor: '#00FF00'
+          });
+        }
+      });
+      manifest.styles = manifest.styles.filter(function(colorObj) {
+        return colorLayoutDirs.indexOf(colorObj.name) >= 0;
+      });
+    }
+
+    function processManifestLayouts(theme, manifest) {
+      var themeLayoutDirs = grunt.file.expand('themes/' + theme + '/layouts/*')
+        .filter(function(fileName) {
+          return grunt.file.isDir(fileName);
+        }).map(function(fileName) {
+          return getAdjacent(fileName.split('/'), 'layouts');
+        });
+
+      themeLayoutDirs.forEach(function(layoutName) {
+        var exists = manifest.layouts.some(function(layoutObj) {
+          return layoutObj.name === layoutName;
+        });
+        if (!exists) {
+          manifest.layouts.push({
+            name: layoutName,
+            description: 'TODO: Change this description for ' + layoutName
+          });
+        }
+      });
+      manifest.layouts = manifest.layouts.filter(function(layoutObj) {
+        return themeLayoutDirs.indexOf(layoutObj.name) >= 0;
+      });
+    }
+
+    function updateManifest(theme) {
+      var fileName = 'themes/' + theme + '/manifest.json';
+      var manifest = grunt.file.readJSON(fileName);
+      processManifestColors(theme, manifest);
+      processManifestLayouts(theme, manifest);
+      grunt.log.writeln('updating ', fileName['cyan']);
+      grunt.file.write(fileName, JSON.stringify(manifest, null, '  '));
+    }
+
+    /* ---------- code --------- */
+
+    var themeConfigDirs = grunt.file.expand('themes/*').filter(function(fileName) {
+      return grunt.file.isDir(fileName);
+    }).map(function(fileName) {
+      return getAdjacent(fileName.split('/'), 'themes');
+    });
+
+    themeConfigDirs.forEach(function(themeName) {
+      updateManifest(themeName);
+    });
+
+  });
 
   grunt.registerTask('generateThemeConfig', 'update widget positions', function() {
     // these are the properties transferred from the original theme config.json to
     // the generated test config. Supports chained properties with dots up to four deep.
     var overwriteProperties = ['widgetOnScreen', 'map.2D', 'map.3D', 'map.position', 'widgetPool'];
-    var processedConfigs = [];
-    var processedThemes = {};
 
     /* ---------- function definitions ---------- */
 
@@ -33,8 +153,6 @@ module.exports = function(grunt) {
         existingConfig.logo = 'themes/' + options.theme + '/images/icon.png';
         grunt.log.writeln('Generating config file ' + options.dest['green']);
       }
-      processedThemes[options.theme].layouts.push(options.layout);
-      processedConfigs.push(options.dest);
       return existingConfig;
     }
 
@@ -52,10 +170,6 @@ module.exports = function(grunt) {
         grunt.log.writeln('Depth of overwrite field too large: ', prop);
         return;
       }
-    }
-
-    function getAdjacent(split, term) {
-      return split[split.indexOf(term) + 1];
     }
 
     function processThemeConfig(options) {
@@ -83,82 +197,11 @@ module.exports = function(grunt) {
           outputConfig.theme.styles.push(colorName);
         }
         processedStyles.push(colorName);
-        if (processedThemes[themeName].colors.indexOf(colorName) < 0) {
-          processedThemes[themeName].colors.push(colorName);
-        }
       });
       // get rid of output styles that don't exist anymore
       outputConfig.theme.styles = outputConfig.theme.styles.filter(function(style) {
         return processedStyles.indexOf(style) >= 0;
       });
-    }
-
-    function getLayoutDest(themeName, layoutName) {
-      return themeconfigsDir +  '/config-' + themeName + '-' + layoutName + '.json';
-    }
-
-    function processManifestColors(theme, manifest) {
-      processedThemes[theme].colors.forEach(function(colorName) {
-        var exists = manifest.styles.some(function(colorObj) {
-          return colorObj.name === colorName;
-        });
-        if (!exists) {
-          manifest.styles.push({
-            name: colorName,
-            description: 'TODO: Change this description and styleColor for ' + colorName,
-            styleColor: '#00ff00'
-          });
-        }
-      });
-      console.log('manifest.styles', JSON.stringify(manifest.styles));
-      manifest.styles = manifest.styles.filter(function(colorObj) {
-        return processedThemes[theme].colors.indexOf(colorObj.name) >= 0;
-      });
-    }
-
-    function processManifestLayouts(theme, manifest) {
-      processedThemes[theme].layouts.forEach(function(layoutName) {
-        var exists = manifest.layouts.some(function(layoutObj) {
-          return layoutObj.name === layoutName;
-        });
-        if (!exists) {
-          manifest.layouts.push({
-            name: layoutName,
-            description: 'TODO: Change this description for ' + layoutName
-          });
-        }
-      });
-      manifest.layouts = manifest.layouts.filter(function(layoutObj) {
-        return processedThemes[theme].layouts.indexOf(layoutObj.name) >= 0;
-      });
-    }
-
-    function updateManifests() {
-      console.log('processedThemes keys', Object.keys(processedThemes));
-      Object.keys(processedThemes).forEach(function(theme) {
-        var fileName = 'themes/' + theme + '/manifest.json';
-        var manifest = grunt.file.readJSON(fileName);
-        processManifestColors(theme, manifest);
-        processManifestLayouts(theme, manifest);
-        grunt.file.write(fileName, JSON.stringify(manifest, null, '  '));
-      });
-    }
-
-    function cleanupThemeConfigs() {
-      var generatedConfigs = grunt.file.expand(themeconfigsDir +  '/config-*.json');
-      generatedConfigs.forEach(function(genConfig) {
-        if (processedConfigs.indexOf(genConfig) < 0) {
-          grunt.log.writeln('Should delete old generated config here'['red']);
-        }
-      });
-    }
-
-    function writeClosingInstructions() {
-      grunt.log.writeln('\nReminder: these properties come from the original theme layout config files: ');
-      grunt.log.writeln(overwriteProperties.join(', '));
-      grunt.log.writeln('All other properties should be edited in the generated files in ' + themeconfigsDir + '/ and are used for testing only. They will not persist in a new app in builder mode.'['yellow']);
-      grunt.log.writeln('\nTo test, open ' + 'webappbuilder/stemapp?config=' + themeconfigsDir + '/config-[theme]-[layout].json');
-      grunt.log.writeln('\nTo change the color, edit the order of the \'styles\' array in the config.');
     }
 
     /* ---------- code ---------- */
@@ -171,11 +214,6 @@ module.exports = function(grunt) {
       var themeName = getAdjacent(nameSplit, 'themes');
       var layoutName = getAdjacent(nameSplit, 'layouts');
       var configDest = getLayoutDest(themeName, layoutName);
-      processedThemes[themeName] = processedThemes[themeName] || {
-        layouts: [],
-        colors: []
-      };
-      grunt.log.writeln('processedThemes', JSON.stringify(processedThemes));
 
       var outputConfig = processThemeConfig({
         file: fileName,
@@ -190,34 +228,46 @@ module.exports = function(grunt) {
 
     });
 
-    updateManifests();
+  });
 
-    cleanupThemeConfigs();
-
-    writeClosingInstructions();
-
-});
+  // Load grunt tasks automatically
+  require('load-grunt-tasks')(grunt);
 
   grunt.initConfig({
     watch: {
       main: {
-        files: ['themes/**', '!themes/*/styles/preprocessing/**'],
-        tasks: ['sync:main'],
+        files: [
+          'themes/**',
+          '!themes/*/styles/preprocessing/**',
+          '!themes/*/layouts/*/config.json',
+          themeconfigsDir + '/**'],
+        tasks: ['sync'],
         options: {
           spawn: false
         }
       },
-      themeconfigs: {
-        // need to include styles here in case the style config isn't already written
+      layoutsAndColors: {
         files: ['themes/*/layouts/*/config.json', 'themes/*/styles/*/style.css'],
-        tasks: ['generateThemeConfig'],
+        tasks: ['generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync'],
+        options: {
+          event: ['added', 'deleted'],
+          spawn: false
+        }
+      },
+      themeConfigs: {
+        // need to include styles here in case the style config isn't already written
+        files: ['themes/*/layouts/*/config.json'],
+        tasks: ['generateThemeConfig', 'sync'],
         options: {
           spawn: false
         }
       },
       css: {
-        files: ['themes/*/styles/preprocessing/*.scss'],
-        tasks: ['sass:dev']
+        files: ['themes/*/styles/preprocessing/**'],
+        tasks: ['sass:dev', 'sync'],
+        options: {
+          spawn: false
+        }
       }
 
     },
@@ -252,10 +302,6 @@ module.exports = function(grunt) {
       }
     },
 
-    clean: {
-      // styles: ['themes/*/styles/**', 'themes/*/common.css', '!themes/*/styles/preprocessing/**']
-    },
-
     sync: {
       main: {
         files: [{
@@ -268,5 +314,8 @@ module.exports = function(grunt) {
 
   });
 
-  grunt.registerTask('default', ['sass', 'generateThemeConfig', 'sync', 'watch']);
+  grunt.registerTask('default', ['sass', 'generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync', 'watch']);
+  grunt.event.on('watch', function(action, filepath, target) {
+    grunt.log.writeln(target + ': ' + filepath + ' has ' + action);
+  });
 };

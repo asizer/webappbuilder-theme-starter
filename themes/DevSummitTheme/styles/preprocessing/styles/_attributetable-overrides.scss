@@ -4,17 +4,17 @@ before the widget stylesheets */
 
 /* attribute table hover row */
 body .jimu-widget-attributetable .dgrid-row:hover {
-  background-color: $slightly-less-pale;
+  background: $slightly-less-pale;
 }
 
 /* attribute table selected row */
 body .jimu-widget-attributetable .ui-state-active {
-  background-color: $bright;
+  background: $bright;
 }
 
 /* attribute table hover over selected row */
 body .jimu-widget-attributetable .ui-state-active:hover {
-  background-color: $bright-darker1;
+  background: $bright-darker1;
 }
 
 /* attribute table selected tab */
@@ -26,12 +26,12 @@ body .jimu-widget-attributetable .ui-state-active:hover {
 .jimu-widget-attributetable,
 .jimu-widget-attributetable-main,
 .jimu-widget-attributetable .dgrid-row-odd {
-  background-color: $palest;
+  background: $palest;
 }
 
 .jimu-widget-attributetable .dijitToolbar,
 .jimu-widget-attributetable .dgrid-header {
-  background-color: $less-pale;
+  background: $less-pale;
 }
 
 /* attribute table dropup menu */

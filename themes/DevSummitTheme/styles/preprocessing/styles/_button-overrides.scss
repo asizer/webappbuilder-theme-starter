@@ -1,14 +1,13 @@
 
 /* ---------- ALL BUTTONS ---------- */
-.dijitButtonHover .dijitButtonNode,
+.jimu-widget .dijitButtonHover .dijitButtonNode,
 .dijitDropDownButtonHover .dijitButtonNode,
 .dijitComboButtonHover .dijitButtonNode,
 .dijitToggleButtonHover .dijitButtonNode,
 .dijitToolbar .dijitButtonHover .dijitButtonNode,
 .dijitToolbar .dijitDropDownButtonHover .dijitButtonNode,
 .dijitToolbar .dijitToggleButtonHover .dijitButtonNode,
-.dijitToolbar .dijitComboButtonHover .dijitButtonNode,
-.btn-transparent:hover {
+.dijitToolbar .dijitComboButtonHover .dijitButtonNode {
   border: 1px solid $bright;
 }
 

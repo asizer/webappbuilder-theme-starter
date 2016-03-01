@@ -67,21 +67,7 @@
         "relativeTo": "browser"
       }
     }],
-    "groups": [{
-      "visible": false,
-      "panel": {
-        "uri": "themes/DevSummitTheme/panels/RDockablePanel/Panel",
-        "position": {
-          "right": 0,
-          "top": 110,
-          "bottom": 0,
-          "width": 360,
-          "relativeTo": "browser"
-        }
-      },
-      "maxWidgets": 1,
-      "widgets": []
-    }]
+    "groups": [{}]
   },
 
   "map": {
@@ -90,7 +76,7 @@
 
     "position": {
       "left": 0,
-      "top": 120,
+      "top": 100,
       "right": 0,
       "bottom": 0
     }
