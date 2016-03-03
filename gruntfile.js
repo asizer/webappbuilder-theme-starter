@@ -61,10 +61,10 @@ module.exports = function(grunt) {
             var actualDest;
             if (styleName === 'common') {
               // common.css lives in the theme's root
-              actualDest = dest + themeName + '/common.css';
+              actualDest = dest + '/' + themeName + '/common.css';
             } else {
               // style-specific css lives in the theme's styles/styleName folder as style.css
-              actualDest = dest + themeName + '/styles/' + styleName + '/style.css';
+              actualDest = dest + '/' + themeName + '/styles/' + styleName + '/style.css';
             }
             grunt.log.writeln('writing css file ' + actualDest['cyan']);
             return actualDest;
