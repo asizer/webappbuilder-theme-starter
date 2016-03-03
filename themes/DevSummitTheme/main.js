@@ -2,7 +2,7 @@ define([
   'dojo/query',
   'dojo/topic'
 ], function(dojoQuery, topic){
-  console.debug('Created to DevSummitTheme. Add and remove body classes here');
+  console.debug('Created DevSummitTheme. Add and remove body classes here');
   // dojoQuery('body').removeClass('claro').addClass('flat');
 
   // this main.js only runs the first time a user switches to this theme,

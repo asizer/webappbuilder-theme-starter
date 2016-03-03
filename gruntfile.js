@@ -3,26 +3,26 @@ module.exports = function(grunt) {
   // replace these with your own paths
   var stemappDir = '../../custombuilders/devsummitbuilder13/client/stemapp';
   var themeconfigsDir = 'themeconfigs';
-
-
+  var themesDir = 'themes';
+  var distDir = 'built';
 
   // Load grunt tasks automatically
   require('load-grunt-tasks')(grunt);
 
   grunt.initConfig({
     watch: {
-      main: {
+      themes: {
         files: [
-          'themes/**',
-          '!themes/*/styles/preprocessing/**',
-          '!themes/*/layouts/*/config.json',
+          themesDir + '/**',
+          '!' + themesDir + '/*/styles/preprocessing/**',
+          '!' + themesDir + '/*/layouts/*/config.json',
           themeconfigsDir + '/**'],
         tasks: ['sync'],
         options: {
         }
       },
       layoutsAndColors: {
-        files: ['themes/*/layouts/*/config.json', 'themes/*/styles/*/style.css'],
+        files: [themesDir + '/*/layouts/*/config.json', themesDir + '/*/styles/*/style.css'],
         tasks: ['generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync'],
         options: {
           event: ['added', 'deleted']
@@ -30,30 +30,30 @@ module.exports = function(grunt) {
       },
       themeConfigs: {
         // need to include styles here in case the style config isn't already written
-        files: ['themes/*/layouts/*/config.json'],
+        files: [themesDir + '/*/layouts/*/config.json'],
         tasks: ['generateThemeConfig', 'sync'],
         options: {
         }
       },
       css: {
-        files: ['themes/*/styles/preprocessing/**'],
+        files: [themesDir + '/*/styles/preprocessing/**'],
         tasks: ['sass:dev', 'sync'],
         options: {
         }
       }
-
     },
 
     sass: {
       dev: {
         options: {
           lineNumbers: true,
-          outputStyle: 'expanded'
+          outputStyle: 'expanded',
+          banner: '/* hello world */'
         },
         files: [{
-          cwd: 'themes/',
+          cwd: themesDir,
           src: ['*/styles/preprocessing/*.scss', '!*/styles/preprocessing/_*.scss'],
-          dest: 'themes/',
+          dest: themesDir,
           rename: function(dest, src) {
             var srcSplit = src.split('/');
             var themeName = srcSplit[0];
@@ -77,17 +77,28 @@ module.exports = function(grunt) {
     sync: {
       main: {
         files: [{
-          src: ['themes/**', themeconfigsDir + '/**', '!themes/*/styles/preprocessing/**'],
+          src: [themesDir + '/**', themeconfigsDir + '/**', '!' + themesDir + '/*/styles/preprocessing/**'],
           dest: stemappDir
         }],
         verbose: true // Display log messages when syncing files
+      }
+    },
+
+    clean: {
+      dist: [distDir]
+    },
+
+    copy: {
+      dist: {
+        src: [themesDir, '!' + themesDir + '/*/styles/preprocessing/**'],
+        dest: distDir
       }
     }
 
   });
 
   grunt.registerTask('default', ['sass', 'generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync', 'watch']);
-
+  grunt.registerTask('dist', ['clean:dist', 'copy:dist']);
 
 
 
@@ -96,7 +107,7 @@ module.exports = function(grunt) {
 
 
   /* ---------- CODE THAT MIGHT EVENTUALLY END UP AS ITS OWN PLUGIN(S) SOMEDAY ---------- */
-  /* -------- but fow now will just live here as registeredTasks in this project -------- */
+  /* -------- but for now will just live here as registeredTasks in this project -------- */
 
 
   /* ---------- some utility functions used by multiple custom tasks below ---------- */
@@ -115,7 +126,7 @@ module.exports = function(grunt) {
     /* ---------- functions ---------- */
 
     function findThemeLayouts(theme) {
-      var themeLayoutNames = grunt.file.expand('themes/' + theme + '/layouts/*')
+      var themeLayoutNames = grunt.file.expand(themesDir + '/' + theme + '/layouts/*')
         .filter(function(fileName) {
           return grunt.file.isDir(fileName);
         }).map(function(fileName) {
@@ -126,10 +137,10 @@ module.exports = function(grunt) {
 
     /* ---------- code ---------- */
 
-    var themeNames = grunt.file.expand('themes/*').filter(function(fileName) {
+    var themeNames = grunt.file.expand(themesDir + '/*').filter(function(fileName) {
       return grunt.file.isDir(fileName);
     }).map(function(fileName) {
-      return getAdjacent(fileName.split('/'), 'themes');
+      return getAdjacent(fileName.split('/'), themesDir);
     });
 
     var processedConfigs = [];
@@ -153,7 +164,7 @@ module.exports = function(grunt) {
   grunt.registerTask('updateThemeManifests', 'update manifest.json files to reflect current state of theme layouts and colors', function() {
 
     function processManifestColors(theme, manifest) {
-      var colorLayoutDirs = grunt.file.expand('themes/' + theme + '/styles/*/style.css')
+      var colorLayoutDirs = grunt.file.expand(themesDir + '/' + theme + '/styles/*/style.css')
         .filter(function(fileName) {
           return fileName.indexOf('preprocessing') < 0;
         }).map(function(fileName) {
@@ -178,7 +189,7 @@ module.exports = function(grunt) {
     }
 
     function processManifestLayouts(theme, manifest) {
-      var themeLayoutDirs = grunt.file.expand('themes/' + theme + '/layouts/*/config.json')
+      var themeLayoutDirs = grunt.file.expand(themesDir + '/' + theme + '/layouts/*/config.json')
         .map(function(fileName) {
           return getAdjacent(fileName.split('/'), 'layouts');
         });
@@ -200,7 +211,7 @@ module.exports = function(grunt) {
     }
 
     function updateManifest(theme) {
-      var fileName = 'themes/' + theme + '/manifest.json';
+      var fileName = themesDir + '/' + theme + '/manifest.json';
       var manifest = grunt.file.readJSON(fileName);
       processManifestColors(theme, manifest);
       processManifestLayouts(theme, manifest);
@@ -210,9 +221,9 @@ module.exports = function(grunt) {
 
     /* ---------- code --------- */
 
-    var themeConfigDirs = grunt.file.expand('themes/*/manifest.json')
+    var themeConfigDirs = grunt.file.expand(themesDir + '/*/manifest.json')
       .map(function(fileName) {
-        return getAdjacent(fileName.split('/'), 'themes');
+        return getAdjacent(fileName.split('/'), themesDir);
       });
 
     themeConfigDirs.forEach(function(themeName) {
@@ -242,7 +253,7 @@ module.exports = function(grunt) {
         existingConfig.theme.name = options.theme;
         existingConfig.title = 'Using config generated by Grunt';
         existingConfig.subtitle = 'edit config in ' + themeconfigsDir + '/ folder';
-        existingConfig.logo = 'themes/' + options.theme + '/images/icon.png';
+        existingConfig.logo = themesDir + '/' + options.theme + '/images/icon.png';
         grunt.log.writeln('Generating config file ' + options.dest['green']);
       }
       return existingConfig;
@@ -278,7 +289,7 @@ module.exports = function(grunt) {
     function processColors(outputConfig, themeName) {
 
       // list available styles in config
-      var themeColorFiles = grunt.file.expand('themes/' + themeName + '/styles/*/style.css');
+      var themeColorFiles = grunt.file.expand(themesDir + '/' + themeName + '/styles/*/style.css');
       outputConfig.theme.styles = outputConfig.theme.styles || [];
       // copy existing styles to compare later
       var processedStyles = [];
@@ -299,11 +310,11 @@ module.exports = function(grunt) {
     /* ---------- code ---------- */
 
     // get all theme config.jsons
-    var layoutConfigs = grunt.file.expand('themes/*/layouts/*/config.json');
+    var layoutConfigs = grunt.file.expand(themesDir + '/*/layouts/*/config.json');
 
     layoutConfigs.forEach(function(fileName) {
       var nameSplit = fileName.split('/');
-      var themeName = getAdjacent(nameSplit, 'themes');
+      var themeName = getAdjacent(nameSplit, themesDir);
       var layoutName = getAdjacent(nameSplit, 'layouts');
       var configDest = getLayoutDest(themeName, layoutName);
 
