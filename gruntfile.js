@@ -126,10 +126,8 @@ module.exports = function(grunt) {
     /* ---------- functions ---------- */
 
     function findThemeLayouts(theme) {
-      var themeLayoutNames = grunt.file.expand(themesDir + '/' + theme + '/layouts/*')
-        .filter(function(fileName) {
-          return grunt.file.isDir(fileName);
-        }).map(function(fileName) {
+      var themeLayoutNames = grunt.file.expand(themesDir + '/' + theme + '/layouts/*/config.json')
+        .map(function(fileName) {
           return getAdjacent(fileName.split('/'), 'layouts');
         });
       return themeLayoutNames;
