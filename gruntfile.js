@@ -90,8 +90,8 @@ module.exports = function(grunt) {
 
     copy: {
       dist: {
-        src: [themesDir, '!' + themesDir + '/*/styles/preprocessing/**'],
-        dest: distDir
+        src: [themesDir + '/**', '!' + themesDir + '/*/styles/preprocessing/**', '!' + themesDir + '/*/styles/README.*'],
+        dest: distDir + '/'
       }
     }
 

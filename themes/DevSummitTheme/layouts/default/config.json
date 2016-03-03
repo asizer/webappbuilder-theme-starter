@@ -64,6 +64,7 @@
     }, {
       "uri": "widgets/AttributeTable/Widget",
       "position": {
+        "bottom": 100,
         "relativeTo": "browser"
       }
     }],
@@ -78,7 +79,7 @@
       "left": 0,
       "top": 100,
       "right": 0,
-      "bottom": 0
+      "bottom": 100
     }
   },
 
