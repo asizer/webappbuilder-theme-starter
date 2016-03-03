@@ -210,11 +210,57 @@ module.exports = function(grunt) {
       });
     }
 
+    function processManifestWidgets(theme, manifest) {
+      var themeWidgetDirs = grunt.file.expand(themesDir + '/' + theme + '/widgets/*/manifest.json')
+        .map(function(fileName) {
+          return getAdjacent(fileName.split('/'), 'widgets');
+        });
+
+      themeWidgetDirs.forEach(function(widgetName) {
+        var exists = manifest.widgets.some(function(widgetObj) {
+          return widgetObj.name === widgetName;
+        });
+        if (!exists) {
+          manifest.widgets.push({
+            name: widgetName,
+            description: 'TODO: Change this description for ' + widgetName
+          });
+        }
+      });
+      manifest.widgets = manifest.widgets.filter(function(widgetObj) {
+        return themeWidgetDirs.indexOf(widgetObj.name) >= 0;
+      });
+    }
+
+    function processManifestPanels(theme, manifest) {
+      var themePanelDirs = grunt.file.expand(themesDir + '/' + theme + '/panels/*/Panel.js')
+        .map(function(fileName) {
+          return getAdjacent(fileName.split('/'), 'panels');
+        });
+
+      themePanelDirs.forEach(function(panelName) {
+        var exists = manifest.panels.some(function(panelObj) {
+          return panelObj.name === panelName;
+        });
+        if (!exists) {
+          manifest.panels.push({
+            name: panelName,
+            description: 'TODO: Change this description for ' + panelName
+          });
+        }
+      });
+      manifest.panels = manifest.panels.filter(function(panelObj) {
+        return themePanelDirs.indexOf(panelObj.name) >= 0;
+      });
+    }
+
     function updateManifest(theme) {
       var fileName = themesDir + '/' + theme + '/manifest.json';
       var manifest = grunt.file.readJSON(fileName);
       processManifestColors(theme, manifest);
       processManifestLayouts(theme, manifest);
+      processManifestWidgets(theme, manifest);
+      processManifestPanels(theme, manifest);
       grunt.log.writeln('updating ', fileName['cyan']);
       grunt.file.write(fileName, JSON.stringify(manifest, null, '  '));
     }
