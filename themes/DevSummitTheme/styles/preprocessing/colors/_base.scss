@@ -1,6 +1,6 @@
 body {
   color: $brand-darker;
-  background: $brand-lighter;
+  background: $brand-primary;
 }
 
 a {
@@ -13,12 +13,12 @@ a {
 
 .dijitTooltipDialog .dijitTooltipContainer {
   color: $brand-darker;
-  background: $brand-lighter;
+  background: $brand-lightest;
 }
 
 #map {
   /* wab gives the map div an #eee background inline :( */
-  background: $brand-lighter !important;
+  background: $brand-primary !important;
 }
 
 .esriViewPopup .hzLine {

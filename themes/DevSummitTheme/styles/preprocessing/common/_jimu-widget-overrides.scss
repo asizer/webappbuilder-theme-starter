@@ -1,6 +1,7 @@
 /* get rid of border radius */
 .jimu-widget-onscreen-icon,
 .jimu-widget-homebutton,
+.HomeButton .home,
 .jimu-widget-mylocation,
 .jimu-widget-zoomslider,
 .jimu-widget-coordinate .coordinate-background,
@@ -14,4 +15,8 @@
 /* override hardcodes so panel colors can show through */
 .jimu-widget-layerList .layer-row {
   background-color: transparent;
+}
+
+.jimu-widget-basemapgallery .esriBasemapGalleryNode {
+  cursor: pointer;
 }

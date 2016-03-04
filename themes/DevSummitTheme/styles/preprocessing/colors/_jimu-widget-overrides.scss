@@ -1,12 +1,12 @@
 /* make text in all widgets match theme's dark color */
 .jimu-widget {
-  color: $brand-darker;
+  color: $brand-primary;
 }
 
 .jimu-title,
 .jimu-subtitle,
 .jimu-widget-zoomslider {
-  color: $brand-lighter;
+  color: $brand-lightest;
 }
 
 .jimu-dropmenu .menu-item:hover {
@@ -20,7 +20,7 @@
 /* ---------- on-screen icons and search ---------- */
 .jimu-widget-search .arcgisSearch .searchBtn:hover,
 .jimu-widget-search .arcgisSearch .searchBtn:focus {
-  background-color: $brand-darker;
+  background-color: $brand-primary;
 }
 
 .arcgisSearch .searchGroup .searchInput,
@@ -34,8 +34,8 @@
 .jimu-widget-mylocation,
 .jimu-widget-zoomslider,
 .jimu-widget-coordinate .coordinate-background {
-  background-color: $brand-darker;
-  background-color: rgba($brand-darker, 0.5);
+  background-color: $brand-primary;
+  background-color: rgba($brand-primary, 0.5);
 }
 
 .jimu-widget-onscreen-icon {
@@ -46,6 +46,19 @@
 .jimu-widget-homebutton:hover,
 .jimu-widget-mylocation:hover,
 .jimu-widget-zoomslider .zoom:hover {
-  background-color: $brand-darker;
-  background-color: rgba($brand-darker, 0.8);
+  background-color: $brand-primary;
+  background-color: rgba($brand-primary, 0.8);
+}
+
+.jimu-widget-homebutton.inHome .HomeButton .home {
+  border: 1px solid $brand-darker;
+  background-color: $brand-info;
+}
+
+.jimu-widget-basemapgallery .esriBasemapGalleryNode:hover {
+  color: $brand-warning;
+}
+
+.jimu-widget-layerList .div-content {
+  color: $brand-darker;
 }
