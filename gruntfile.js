@@ -11,6 +11,9 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     watch: {
+      options: {
+        verbose: true
+      },
       themes: {
         files: [
           themesDir + '/**',
@@ -22,7 +25,17 @@ module.exports = function(grunt) {
         }
       },
       layoutsAndColors: {
-        files: [themesDir + '/*/layouts/*/config.json', themesDir + '/*/styles/*/style.css'],
+        files: [
+          // need to watch the folders for creation and deletion as well as the files.
+          // file creation doesn't always get picked up here.
+          themesDir + '/*/layouts/*/config.json',
+          themesDir + '/*/layouts/*',
+          themesDir + '/*/widgets/*/manifest.json',
+          themesDir + '/*/widgets/*',
+          themesDir + '/*/panels/*/Panel.js',
+          themesDir + '/*/panels/*',
+          themesDir + '/*/styles/*/style.css',
+          themesDir + '/*/styles/*'],
         tasks: ['generateThemeConfig', 'updateThemeManifests', 'suggestConfigCleanups', 'sync'],
         options: {
           event: ['added', 'deleted']
@@ -191,15 +204,19 @@ module.exports = function(grunt) {
       if (stylesFlag) {
         thingDirs = getStyleDirs(theme, thingFile);
       } else {
-        thingDirs = grunt.file.expand(themesDir + '/' + theme + '/' + thingType + '/*/' + thingFile);
+        var path = themesDir + '/' + theme + '/' + thingType + '/*/' + thingFile;
+        thingDirs = grunt.file.expand(path)
+          .map(function(fileName) {
+            return getAdjacent(fileName.split('/'), thingType);
+          });
       }
 
-      thingDirs.forEach(function(thingName) {
+      thingDirs.forEach(function(thingName, i) {
         var exists = manifest[thingType].some(function(obj) {
           return obj.name === thingName;
         });
         if (!exists) {
-          var entry = stylesFlag ? getStylesObj : getGenericObj;
+          var entry = stylesFlag ? getStylesObj(thingName, i) : getGenericObj(thingName);
           manifest[thingType].push(entry);
         }
       });
