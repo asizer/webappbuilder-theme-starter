@@ -1,26 +1,26 @@
 body {
-  color: $darker;
-  background: $bright;
+  color: $brand-darker;
+  background: $brand-lighter;
 }
 
 a {
-  color: $bright-darker1;
+  color: $brand-primary;
 }
 
 .jimu-main-background {
-  background-color: $darker;
+  background-color: $brand-primary;
 }
 
 .dijitTooltipDialog .dijitTooltipContainer {
-  color: $darker;
-  background: $palest;
+  color: $brand-darker;
+  background: $brand-lighter;
 }
 
 #map {
   /* wab gives the map div an #eee background inline :( */
-  background: $palest !important;
+  background: $brand-lighter !important;
 }
 
 .esriViewPopup .hzLine {
-  border-color: $darker;
+  border-color: $brand-warning;
 }

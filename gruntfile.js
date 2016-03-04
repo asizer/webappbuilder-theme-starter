@@ -135,11 +135,10 @@ module.exports = function(grunt) {
 
     /* ---------- code ---------- */
 
-    var themeNames = grunt.file.expand(themesDir + '/*').filter(function(fileName) {
-      return grunt.file.isDir(fileName);
-    }).map(function(fileName) {
-      return getAdjacent(fileName.split('/'), themesDir);
-    });
+    var themeNames = grunt.file.expand(themesDir + '/*/manifest.json')
+      .map(function(fileName) {
+        return getAdjacent(fileName.split('/'), themesDir);
+      });
 
     var processedConfigs = [];
 
@@ -160,105 +159,64 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('updateThemeManifests', 'update manifest.json files to reflect current state of theme layouts and colors', function() {
+    var brightColors = ['#00FF00', '#FF00FF', '#00FFFF', '#660066', '#FF0000', '#FFFF00' ];
 
-    function processManifestColors(theme, manifest) {
-      var colorLayoutDirs = grunt.file.expand(themesDir + '/' + theme + '/styles/*/style.css')
+    function getStyleDirs(theme, thingFile) {
+      return grunt.file.expand(themesDir + '/' + theme + '/styles/*/' + thingFile)
         .filter(function(fileName) {
           return fileName.indexOf('preprocessing') < 0;
         }).map(function(fileName) {
           return getAdjacent(fileName.split('/'), 'styles');
         });
-
-      colorLayoutDirs.forEach(function(colorName) {
-        var exists = manifest.styles.some(function(colorObj) {
-          return colorObj.name === colorName;
-        });
-        if (!exists) {
-          manifest.styles.push({
-            name: colorName,
-            description: 'TODO: Change this description and styleColor for ' + colorName,
-            styleColor: '#00FF00'
-          });
-        }
-      });
-      manifest.styles = manifest.styles.filter(function(colorObj) {
-        return colorLayoutDirs.indexOf(colorObj.name) >= 0;
-      });
     }
 
-    function processManifestLayouts(theme, manifest) {
-      var themeLayoutDirs = grunt.file.expand(themesDir + '/' + theme + '/layouts/*/config.json')
-        .map(function(fileName) {
-          return getAdjacent(fileName.split('/'), 'layouts');
-        });
-
-      themeLayoutDirs.forEach(function(layoutName) {
-        var exists = manifest.layouts.some(function(layoutObj) {
-          return layoutObj.name === layoutName;
-        });
-        if (!exists) {
-          manifest.layouts.push({
-            name: layoutName,
-            description: 'TODO: Change this description for ' + layoutName
-          });
-        }
-      });
-      manifest.layouts = manifest.layouts.filter(function(layoutObj) {
-        return themeLayoutDirs.indexOf(layoutObj.name) >= 0;
-      });
+    function getStylesObj(colorName, i) {
+      return {
+        name: colorName,
+        description: 'TODO: Change this description and styleColor for ' + colorName,
+        styleColor: brightColors[i % 6]
+      };
     }
 
-    function processManifestWidgets(theme, manifest) {
-      var themeWidgetDirs = grunt.file.expand(themesDir + '/' + theme + '/widgets/*/manifest.json')
-        .map(function(fileName) {
-          return getAdjacent(fileName.split('/'), 'widgets');
-        });
-
-      themeWidgetDirs.forEach(function(widgetName) {
-        var exists = manifest.widgets.some(function(widgetObj) {
-          return widgetObj.name === widgetName;
-        });
-        if (!exists) {
-          manifest.widgets.push({
-            name: widgetName,
-            description: 'TODO: Change this description for ' + widgetName
-          });
-        }
-      });
-      manifest.widgets = manifest.widgets.filter(function(widgetObj) {
-        return themeWidgetDirs.indexOf(widgetObj.name) >= 0;
-      });
+    function getGenericObj(thingName) {
+      return {
+        name: thingName,
+        description: 'TODO: Change this description for ' + thingName
+      };
     }
 
-    function processManifestPanels(theme, manifest) {
-      var themePanelDirs = grunt.file.expand(themesDir + '/' + theme + '/panels/*/Panel.js')
-        .map(function(fileName) {
-          return getAdjacent(fileName.split('/'), 'panels');
-        });
+    function listTheThings(theme, manifest, thingType, thingFile) {
+      var stylesFlag = (thingType === 'styles');
+      var thingDirs;
+      if (stylesFlag) {
+        thingDirs = getStyleDirs(theme, thingFile);
+      } else {
+        thingDirs = grunt.file.expand(themesDir + '/' + theme + '/' + thingType + '/*/' + thingFile);
+      }
 
-      themePanelDirs.forEach(function(panelName) {
-        var exists = manifest.panels.some(function(panelObj) {
-          return panelObj.name === panelName;
+      thingDirs.forEach(function(thingName) {
+        var exists = manifest[thingType].some(function(obj) {
+          return obj.name === thingName;
         });
         if (!exists) {
-          manifest.panels.push({
-            name: panelName,
-            description: 'TODO: Change this description for ' + panelName
-          });
+          var entry = stylesFlag ? getStylesObj : getGenericObj;
+          manifest[thingType].push(entry);
         }
       });
-      manifest.panels = manifest.panels.filter(function(panelObj) {
-        return themePanelDirs.indexOf(panelObj.name) >= 0;
+      manifest[thingType] = manifest[thingType].filter(function(obj) {
+        return thingDirs.indexOf(obj.name) >= 0;
       });
+
     }
 
     function updateManifest(theme) {
       var fileName = themesDir + '/' + theme + '/manifest.json';
       var manifest = grunt.file.readJSON(fileName);
-      processManifestColors(theme, manifest);
-      processManifestLayouts(theme, manifest);
-      processManifestWidgets(theme, manifest);
-      processManifestPanels(theme, manifest);
+      manifest.name = theme;
+      listTheThings(theme, manifest, 'styles', 'style.css');
+      listTheThings(theme, manifest, 'widgets', 'manifest.json');
+      listTheThings(theme, manifest, 'panels', 'Panel.js');
+      listTheThings(theme, manifest, 'layouts', 'config.json');
       grunt.log.writeln('updating ', fileName['cyan']);
       grunt.file.write(fileName, JSON.stringify(manifest, null, '  '));
     }

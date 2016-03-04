@@ -1,29 +1,13 @@
 {
-  "name": "DevSummitTheme",
+  "name": "",
   "platform": "HTML",
   "panels": [],
-  "styles": [
-    {
-      "name": "default",
-      "description": "Aqua blues",
-      "styleColor": "#8FC3D2"
-    },
-    {
-      "name": "green",
-      "description": "TODO: Change this description and styleColor for green",
-      "styleColor": "#00ff00"
-    }
-  ],
-  "layouts": [
-    {
-      "name": "default",
-      "description": "this is the default layout"
-    }
-  ],
+  "styles": [],
+  "layouts": [],
   "widgets": [],
   "version": "1.3",
   "wabVersion": "1.3",
-  "author": "Esri R&D Center Beijing",
+  "author": "Esri Profressional Services",
   "description": "",
   "copyright": "",
   "license": "http://www.apache.org/licenses/LICENSE-2.0"

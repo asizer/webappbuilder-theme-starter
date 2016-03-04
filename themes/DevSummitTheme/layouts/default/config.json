@@ -20,13 +20,11 @@
         "bottom": 5
       }
     }, {
-      "uri": "widgets/LayerList/Widget",
       "position": {
         "left": 50,
         "top": 55
       }
     }, {
-      "uri": "widgets/BasemapGallery/Widget",
       "position": {
         "left": 100,
         "top": 55
@@ -47,12 +45,12 @@
       "uri": "widgets/ZoomSlider/Widget",
       "position": {
         "top": 10,
-        "left": 7
+        "left": 10
       }
     }, {
       "uri": "widgets/HomeButton/Widget",
       "position": {
-        "left": 7,
+        "left": 10,
         "top": 75
       }
     }, {

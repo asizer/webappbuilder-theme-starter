@@ -2,10 +2,10 @@
 .jimu-on-screen-widget-panel > .jimu-panel-title,
 .jimu-foldable-panel > .jimu-panel-title,
 .jimu-title-panel > .title {
-  background-color: $darker;
+  background-color: $brand-darker;
 }
 
 .jimu-widget-frame.jimu-container {
-  color: $darker;
-  background: $palest;
+  color: $brand-darker;
+  background: $brand-lighter;
 }
